@@ -49,7 +49,19 @@ class TaskViewModel(private val dao: TaskDao) : ViewModel() {
             _tasks.value = emptyList()
         }
     }
+    fun editTask(task: Task, newDescription: String) {
 
+        viewModelScope.launch {
+
+            val updatedTask = task.copy(
+                description = newDescription
+            )
+
+            dao.updateTask(updatedTask)
+
+            _tasks.value = dao.getAllTasks()
+        }
+    }
     val filteredTasks: StateFlow<List<Task>> = combine(_tasks, snapshotFlow { filterMode }) { tasks, mode ->
         when (mode) {
             "Pendientes" -> tasks.filter { !it.isCompleted }
